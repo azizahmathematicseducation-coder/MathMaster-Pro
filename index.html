@@ -1,0 +1,2161 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="description" content="MathMaster Pro - Aplikasi Pembelajaran Matematika Interaktif Online & Offline">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MathMaster Pro">
+    <title>MathMaster Pro — Belajar Matematika Modern</title>
+
+    <!-- Dynamic Manifest Link Placeholder -->
+    <link id="pwa-manifest" rel="manifest" href="">
+    <link id="pwa-apple-icon" rel="apple-touch-icon" href="">
+
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        indigo: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- KaTeX for Fast & Crisp LaTeX Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Custom Scrollbar & Mobile App Polish */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+            overscroll-behavior-y: none;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5rem 0;
+            margin: 0.5rem 0 !important;
+        }
+        .glass-header {
+            background: rgba(79, 70, 229, 0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .animate-pulse-ring {
+            animation: pulse-ring 2s infinite ease-in-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tab-panel {
+            animation: slideUp 0.25s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white pb-24">
+
+    <!-- =====================================================================
+         TOP HEADER BAR (STICKY)
+    ====================================================================== -->
+    <header class="sticky top-0 z-40 glass-header text-white shadow-lg shadow-indigo-900/10 border-b border-indigo-500/30">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center shadow-inner">
+                    <span class="font-mono font-extrabold text-xl text-white tracking-tighter">∑π</span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <h1 class="font-extrabold text-base sm:text-lg tracking-tight leading-none">MathMaster Pro</h1>
+                        <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-400 text-indigo-950 px-1.5 py-0.5 rounded-md">PRO</span>
+                    </div>
+                    <p class="text-[11px] text-indigo-100/90 font-medium mt-0.5">Belajar Matematika Cerdas</p>
+                </div>
+            </div>
+
+            <!-- Right Status & Controls -->
+            <div class="flex items-center gap-2">
+                <!-- XP / Progress Badge -->
+                <div class="hidden sm:flex items-center gap-1.5 bg-indigo-800/70 border border-indigo-400/30 px-2.5 py-1.5 rounded-xl text-xs font-bold">
+                    <i data-lucide="award" class="w-3.5 h-3.5 text-amber-300"></i>
+                    <span id="header-xp">0 XP</span>
+                </div>
+
+                <!-- Online/Offline Indicator -->
+                <div id="network-badge" class="flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-300/40 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all">
+                    <span id="network-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="network-text">Online</span>
+                </div>
+
+                <!-- PWA Install Button (Shown when installable or via help modal) -->
+                <button id="btn-install-pwa" onclick="triggerInstallPWA()" class="hidden items-center gap-1.5 bg-white text-indigo-700 hover:bg-indigo-50 active:scale-95 transition-all px-3 py-1.5 rounded-xl text-xs font-extrabold shadow-sm">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                    <span>Install</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- =====================================================================
+         TOAST NOTIFICATION BANNER
+    ====================================================================== -->
+    <div id="toast-container" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 -translate-y-3">
+        <div id="toast-box" class="bg-slate-900/95 text-white text-xs font-semibold px-4 py-2.5 rounded-2xl shadow-xl border border-slate-700 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+            <span id="toast-message">Tersimpan secara offline!</span>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MAIN CONTENT AREA
+    ====================================================================== -->
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 pt-4 pb-6">
+
+        <!-- =================================================================
+             TAB 1: MATERI LENGKAP (6 TOPIK + LATEX)
+        ================================================================== -->
+        <section id="tab-materi" class="tab-panel space-y-4">
+            <!-- Progress Overview Card -->
+            <div class="bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 rounded-2xl p-4 sm:p-5 text-white shadow-lg shadow-indigo-600/20 relative overflow-hidden">
+                <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider bg-white/15 px-2.5 py-1 rounded-lg mb-2">
+                            <i data-lucide="sparkles" class="w-3 h-3 text-amber-300"></i> Kurikulum Lengkap Offline
+                        </span>
+                        <h2 class="text-lg sm:text-xl font-extrabold tracking-tight">Modul & Rumus Matematika</h2>
+                        <p class="text-xs sm:text-sm text-indigo-100 mt-1">Pelajari 6 bab inti lengkap dengan rumus LaTeX, sifat, dan contoh soal terstruktur.</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3 min-w-[140px]">
+                        <div class="flex justify-between items-center text-xs font-bold mb-1.5">
+                            <span>Progres Belajar</span>
+                            <span id="materi-progress-text">0/6</span>
+                        </div>
+                        <div class="w-full h-2 bg-indigo-950/60 rounded-full overflow-hidden">
+                            <div id="materi-progress-bar" class="h-full bg-amber-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Decorative Circle -->
+                <div class="absolute -right-8 -bottom-10 w-36 h-36 rounded-full bg-white/10 pointer-events-none"></div>
+            </div>
+
+            <!-- Topic Selector Pills -->
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1" id="materi-pills">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Selected Materi Detail Card -->
+            <div id="materi-content-card" class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-4 sm:p-6 space-y-5">
+                <!-- Populated dynamically with KaTeX -->
+            </div>
+        </section>
+
+        <!-- =================================================================
+             TAB 2: SIMULASI KALKULATOR GEOMETRI INTERAKTIF
+        ================================================================== -->
+        <section id="tab-simulasi" class="tab-panel hidden space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                                <i data-lucide="compass" class="w-4 h-4"></i>
+                            </span>
+                            Simulasi & Kalkulator Geometri
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Ubah dimensi angka di bawah untuk menghitung langsung secara real-time.</p>
+                    </div>
+                    <!-- Mode Switch: Bangun Datar vs Bangun Ruang -->
+                    <div class="inline-flex bg-slate-100 p-1 rounded-xl self-start">
+                        <button id="sim-mode-2d" onclick="setSimCategory('2d')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-sm">
+                            Bangun Datar (2D)
+                        </button>
+                        <button id="sim-mode-3d" onclick="setSimCategory('3d')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-900">
+                            Bangun Ruang (3D)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Shape Selector Grid -->
+                <div id="sim-shape-buttons" class="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-5">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Interactive Workspace -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+                    <!-- Left: Visual SVG Diagram & Inputs -->
+                    <div class="md:col-span-6 space-y-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+                        <div class="flex items-center justify-between">
+                            <span id="sim-shape-title" class="font-extrabold text-sm text-indigo-700">Persegi</span>
+                            <span class="text-[11px] font-semibold text-slate-400 bg-white px-2 py-0.5 rounded-md border border-slate-200">Auto-Hitung</span>
+                        </div>
+
+                        <!-- Dynamic SVG Diagram -->
+                        <div id="sim-svg-container" class="w-full h-44 bg-white rounded-xl border border-slate-200/80 flex items-center justify-center p-2">
+                            <!-- SVG inserted dynamically -->
+                        </div>
+
+                        <!-- Dynamic Input Controls -->
+                        <div id="sim-inputs" class="space-y-3">
+                            <!-- Inputs inserted dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Real-time Results & Step-by-step Formula -->
+                    <div class="md:col-span-6 space-y-4">
+                        <div id="sim-results-cards" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- Result cards inserted dynamically -->
+                        </div>
+
+                        <div class="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-4 space-y-2">
+                            <h3 class="text-xs font-extrabold uppercase tracking-wider text-indigo-700 flex items-center gap-1.5">
+                                <i data-lucide="function-square" class="w-4 h-4"></i> Langkah Perhitungan
+                            </h3>
+                            <div id="sim-steps" class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                                <!-- Formula steps rendered with KaTeX -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================
+             TAB 3: QUIZ INTERAKTIF PER MATERI + SKOR + PEMBAHASAN
+        ================================================================== -->
+        <section id="tab-quiz" class="tab-panel hidden space-y-4">
+            <!-- Quiz Header & Topic Filter -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                                <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+                            </span>
+                            Latihan Soal & Quiz Mandiri
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Uji pemahamanmu per topik. Skor tersimpan otomatis di perangkat.</p>
+                    </div>
+                    <div class="flex items-center gap-2 bg-indigo-50 border border-indigo-100 px-3 py-1.5 rounded-xl">
+                        <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i>
+                        <span class="text-xs font-bold text-indigo-900">Skor Terbaik Topik: <span id="quiz-best-score">0%</span></span>
+                    </div>
+                </div>
+
+                <!-- Topic Tabs for Quiz -->
+                <div id="quiz-topic-pills" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Active Quiz Area -->
+            <div id="quiz-stage" class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- =================================================================
+             TAB 4: VIDEO PEMBELAJARAN YOUTUBE (ONLINE / OFFLINE FALLBACK)
+        ================================================================== -->
+        <section id="tab-video" class="tab-panel hidden space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
+                                <i data-lucide="play-circle" class="w-4 h-4"></i>
+                            </span>
+                            Video Pembelajaran Matematika
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Penjelasan visual pilihan dari kanal edukasi matematika terbaik.</p>
+                    </div>
+                    <span id="video-net-status" class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 self-start">
+                        <i data-lucide="wifi" class="w-3.5 h-3.5"></i> Streaming Siap
+                    </span>
+                </div>
+
+                <!-- Offline Warning Box (Shown automatically when offline) -->
+                <div id="video-offline-alert" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+                        <i data-lucide="wifi-off" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-extrabold text-amber-900">Mode Offline Terdeteksi</h3>
+                        <p class="text-xs text-amber-800 mt-1 leading-relaxed">
+                            Pemutaran video YouTube memerlukan koneksi internet. Selama offline, Anda tetap dapat mempelajari seluruh <strong>Materi LaTeX, Simulasi Kalkulator, Quiz, Game Matematika, dan Chatbot AI</strong> tanpa kuota!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Active Video Player -->
+                <div class="space-y-3">
+                    <div class="relative w-full aspect-video bg-slate-900 rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                        <iframe id="youtube-player" class="w-full h-full" src="https://www.youtube.com/embed/YompsDlEdtc" title="Video Pembelajaran Matematika" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+                        <div>
+                            <span id="active-video-topic" class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded-md">Pythagoras</span>
+                            <h3 id="active-video-title" class="text-sm sm:text-base font-extrabold text-slate-900 mt-1">Konsep Dasar Teorema Pythagoras & Pembuktiannya</h3>
+                        </div>
+                        <span id="active-video-duration" class="text-xs font-mono font-bold text-slate-500 bg-white px-2.5 py-1 rounded-lg border border-slate-200 self-start">08:45</span>
+                    </div>
+                </div>
+
+                <!-- Video Playlist Grid -->
+                <div>
+                    <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2.5">Daftar Putar per Materi</h3>
+                    <div id="video-playlist" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================
+             TAB 5: GAME MATEMATIKA (HITUNG CEPAT & PUZZLE MAGIC SQUARE)
+        ================================================================== -->
+        <section id="tab-game" class="tab-panel hidden space-y-4">
+            <!-- Game Selector Header -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                                <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+                            </span>
+                            Arena Game Matematika
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Asah ketangkasan berhitung dan logika spasial secara offline.</p>
+                    </div>
+                    <div class="inline-flex bg-slate-100 p-1 rounded-xl self-start">
+                        <button id="game-tab-speed" onclick="switchGame('speed')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-sm">
+                            ⚡ Hitung Cepat
+                        </button>
+                        <button id="game-tab-puzzle" onclick="switchGame('puzzle')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-900">
+                            🧩 Puzzle Ajaib
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GAME 1: HITUNG CEPAT (SPEED MATH) -->
+            <div id="game-speed-container" class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-5">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl">
+                            <span class="text-[11px] font-bold text-amber-700 block">REKOR TERTINGGI</span>
+                            <span id="speed-highscore" class="font-mono font-extrabold text-base text-amber-900">0</span>
+                        </div>
+                        <div class="bg-indigo-50 border border-indigo-100 px-3 py-1.5 rounded-xl">
+                            <span class="text-[11px] font-bold text-indigo-700 block">SKOR SAAT INI</span>
+                            <span id="speed-score" class="font-mono font-extrabold text-base text-indigo-900">0</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[11px] font-bold text-slate-400 block">SISA WAKTU</span>
+                        <span id="speed-timer" class="font-mono font-extrabold text-2xl text-rose-600">60s</span>
+                    </div>
+                </div>
+
+                <!-- Start / Play Screen -->
+                <div id="speed-start-screen" class="text-center py-6 space-y-4">
+                    <div class="w-16 h-16 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto text-3xl font-extrabold shadow-inner">
+                        ⚡
+                    </div>
+                    <div class="max-w-md mx-auto">
+                        <h3 class="text-lg font-extrabold text-slate-900">Tantangan Hitung Cepat 60 Detik</h3>
+                        <p class="text-xs text-slate-500 mt-1">Jawab sebanyak mungkin soal aritmatika, pangkat, dan akar sebelum waktu habis. Jawaban beruntun menambah bonus kombo!</p>
+                    </div>
+                    <button onclick="startSpeedGame()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-extrabold text-sm px-6 py-3 rounded-xl shadow-lg shadow-indigo-600/25 transition-all">
+                        <i data-lucide="play" class="w-4 h-4"></i> Mulai Bermain
+                    </button>
+                </div>
+
+                <!-- Active Gameplay Screen -->
+                <div id="speed-play-screen" class="hidden space-y-5">
+                    <div class="flex items-center justify-between">
+                        <span id="speed-combo-badge" class="text-xs font-extrabold bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg">
+                            Kombo 1x
+                        </span>
+                        <button onclick="stopSpeedGame(true)" class="text-xs font-bold text-slate-400 hover:text-rose-600">
+                            Akhiri Sesi
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-900 text-white rounded-2xl p-6 text-center shadow-inner">
+                        <span class="text-xs uppercase tracking-widest text-indigo-300 font-bold">Hitung Nilai Dari</span>
+                        <div id="speed-question" class="font-mono text-3xl sm:text-4xl font-extrabold mt-2 tracking-tight">
+                            12 × 8 = ?
+                        </div>
+                    </div>
+
+                    <!-- 4 Multiple Choice Quick Buttons -->
+                    <div id="speed-options" class="grid grid-cols-2 gap-3">
+                        <!-- Options generated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- GAME 2: PUZZLE MATEMATIKA (MAGIC SQUARE 3x3) -->
+            <div id="game-puzzle-container" class="hidden bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-900">Persegi Ajaib (Magic Square 3×3)</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Isi kotak kosong agar jumlah setiap baris, kolom, dan diagonal sama dengan <strong>Target Ajaib</strong>.</p>
+                    </div>
+                    <div class="flex items-center gap-2 self-start">
+                        <span class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-3 py-1.5 rounded-xl">
+                            Target Jumlah: <span id="puzzle-target" class="font-mono text-sm">15</span>
+                        </span>
+                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-2.5 py-1.5 rounded-xl">
+                            Selesai: <span id="puzzle-solved-count">0</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 3x3 Grid -->
+                <div class="max-w-xs mx-auto">
+                    <div id="magic-grid" class="grid grid-cols-3 gap-2.5 bg-indigo-50 p-3.5 rounded-2xl border border-indigo-200">
+                        <!-- 9 Cells generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Puzzle Controls -->
+                <div class="flex flex-wrap items-center justify-center gap-3">
+                    <button onclick="checkMagicPuzzle()" class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-md shadow-indigo-600/20 transition-all">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i> Periksa Jawaban
+                    </button>
+                    <button onclick="generateMagicPuzzle()" class="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-xl transition-all">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i> Puzzle Baru
+                    </button>
+                </div>
+                <div id="puzzle-feedback" class="text-center text-xs font-bold hidden p-3 rounded-xl"></div>
+            </div>
+        </section>
+
+        <!-- =================================================================
+             TAB 6: CHATBOT AI MATEMATIKA STEP-BY-STEP (OFFLINE ENGINE)
+        ================================================================== -->
+        <section id="tab-chatbot" class="tab-panel hidden">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-[calc(100vh-175px)] min-h-[460px] max-h-[680px] overflow-hidden">
+                <!-- Chatbot Header -->
+                <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm">
+                            <i data-lucide="bot" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                                MathBot AI Tutor
+                                <span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">Offline Ready</span>
+                            </h2>
+                            <p class="text-[11px] text-slate-500">Penyelesai Persamaan & Penjelas Rumus Step-by-Step</p>
+                        </div>
+                    </div>
+                    <button onclick="clearChatHistory()" title="Hapus Riwayat Chat" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Quick Prompt Suggestions -->
+                <div class="px-3 py-2 bg-indigo-50/60 border-b border-indigo-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                    <span class="text-[10px] font-bold text-indigo-700 uppercase shrink-0 mr-1">Coba:</span>
+                    <button onclick="sendQuickPrompt('Selesaikan x^2 - 5x + 6 = 0')" class="shrink-0 text-[11px] font-semibold bg-white hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-lg transition-colors">
+                        x² - 5x + 6 = 0
+                    </button>
+                    <button onclick="sendQuickPrompt('Pythagoras a=6, b=8')" class="shrink-0 text-[11px] font-semibold bg-white hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-lg transition-colors">
+                        Pythagoras a=6, b=8
+                    </button>
+                    <button onclick="sendQuickPrompt('Rumus trigonometri sin cos tan')" class="shrink-0 text-[11px] font-semibold bg-white hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-lg transition-colors">
+                        Rumus Trigonometri
+                    </button>
+                    <button onclick="sendQuickPrompt('Mean median dari 7, 8, 5, 9, 8, 10')" class="shrink-0 text-[11px] font-semibold bg-white hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-lg transition-colors">
+                        Mean & Median
+                    </button>
+                </div>
+
+                <!-- Messages Feed -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/40">
+                    <!-- Populated from localStorage -->
+                </div>
+
+                <!-- Chat Input Form -->
+                <form onsubmit="handleChatSubmit(event)" class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
+                    <input id="chat-input" type="text" autocomplete="off" placeholder="Tulis soal (misal: 2x + 6 = 14 atau rumus peluang)..." class="flex-1 bg-slate-100 focus:bg-white border border-slate-200 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm outline-none transition-all">
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white p-2.5 rounded-xl shadow-md shadow-indigo-600/20 transition-all">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =====================================================================
+         FIXED BOTTOM NAVIGATION BAR (6 TABS)
+    ====================================================================== -->
+    <nav class="fixed bottom-0 inset-x-0 z-40 glass-nav border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(15,23,42,0.06)]">
+        <div class="max-w-4xl mx-auto grid grid-cols-6 px-1 py-1.5">
+            <button onclick="switchTab('materi')" data-nav="materi" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-indigo-600 bg-indigo-50/90 font-bold transition-all">
+                <i data-lucide="book-open" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px] sm:text-xs tracking-tight">Materi</span>
+            </button>
+            <button onclick="switchTab('simulasi')" data-nav="simulasi" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-indigo-600 font-semibold transition-all">
+                <i data-lucide="calculator" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px] sm:text-xs tracking-tight">Simulasi</span>
+            </button>
+            <button onclick="switchTab('quiz')" data-nav="quiz" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-indigo-600 font-semibold transition-all">
+                <i data-lucide="help-circle" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px] sm:text-xs tracking-tight">Quiz</span>
+            </button>
+            <button onclick="switchTab('video')" data-nav="video" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-indigo-600 font-semibold transition-all">
+                <i data-lucide="video" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px] sm:text-xs tracking-tight">Video</span>
+            </button>
+            <button onclick="switchTab('game')" data-nav="game" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-indigo-600 font-semibold transition-all">
+                <i data-lucide="gamepad-2" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px] sm:text-xs tracking-tight">Game</span>
+            </button>
+            <button onclick="switchTab('chatbot')" data-nav="chatbot" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-indigo-600 font-semibold transition-all">
+                <i data-lucide="bot" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px] sm:text-xs tracking-tight">Chatbot</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- =====================================================================
+         APPLICATION LOGIC, DATA & INLINE PWA SETUP
+    ====================================================================== -->
+    <script>
+        /* ===================================================================
+           1. INLINE PWA MANIFEST & SERVICE WORKER SETUP
+        =================================================================== */
+        (function initInlinePWA() {
+            // Generate crisp SVG icon as Data URL
+            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <defs>
+                    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#4f46e5"/>
+                        <stop offset="100%" stop-color="#312e81"/>
+                    </linearGradient>
+                </defs>
+                <rect width="512" height="512" rx="112" fill="url(#g)"/>
+                <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-weight="800" font-size="220">∑π</text>
+            </svg>`;
+            const iconUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgIcon);
+
+            const appleIcon = document.getElementById('pwa-apple-icon');
+            if (appleIcon) appleIcon.href = iconUrl;
+
+            // Create Inline Web App Manifest via Blob
+            const manifestObj = {
+                name: "MathMaster Pro",
+                short_name: "MathMaster",
+                description: "Aplikasi Belajar Matematika Interaktif Online & Offline dengan LaTeX, Simulasi, Quiz, Game & AI Tutor",
+                start_url: location.href,
+                display: "standalone",
+                background_color: "#f8fafc",
+                theme_color: "#4f46e5",
+                orientation: "portrait-primary",
+                icons: [
+                    { src: iconUrl, sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" },
+                    { src: iconUrl, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
+                ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+            const manifestURL = URL.createObjectURL(manifestBlob);
+            document.getElementById('pwa-manifest').setAttribute('href', manifestURL);
+
+            // Register Inline Service Worker for Offline Caching
+            if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
+                const swCode = `
+                    const CACHE_NAME = 'mathmaster-pro-v1';
+                    const CORE_ASSETS = [
+                        self.location.href,
+                        'https://cdn.tailwindcss.com',
+                        'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css',
+                        'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js',
+                        'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js',
+                        'https://unpkg.com/lucide@latest'
+                    ];
+
+                    self.addEventListener('install', (event) => {
+                        self.skipWaiting();
+                        event.waitUntil(
+                            caches.open(CACHE_NAME).then((cache) => {
+                                return Promise.allSettled(
+                                    CORE_ASSETS.map(url => fetch(url).then(res => {
+                                        if (res.ok) return cache.put(url, res);
+                                    }).catch(() => null))
+                                );
+                            })
+                        );
+                    });
+
+                    self.addEventListener('activate', (event) => {
+                        event.waitUntil(
+                            caches.keys().then(keys => Promise.all(
+                                keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+                            )).then(() => self.clients.claim())
+                        );
+                    });
+
+                    self.addEventListener('fetch', (event) => {
+                        const req = event.request;
+                        if (req.method !== 'GET') return;
+                        // Do not cache YouTube video embeds
+                        if (req.url.includes('youtube.com') || req.url.includes('googlevideo.com')) return;
+
+                        event.respondWith(
+                            caches.match(req).then((cached) => {
+                                const networkFetch = fetch(req).then((networkRes) => {
+                                    if (networkRes && networkRes.status === 200) {
+                                        const clone = networkRes.clone();
+                                        caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
+                                    }
+                                    return networkRes;
+                                }).catch(() => cached);
+                                return cached || networkFetch;
+                            })
+                        );
+                    });
+                `;
+                try {
+                    const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                    const swUrl = URL.createObjectURL(swBlob);
+                    navigator.serviceWorker.register(swUrl).catch(() => {});
+                } catch (e) {}
+            }
+        })();
+
+        // Handle PWA Install Prompt
+        let deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = document.getElementById('btn-install-pwa');
+            installBtn.classList.remove('hidden');
+            installBtn.classList.add('inline-flex');
+        });
+
+        async function triggerInstallPWA() {
+            if (!deferredPrompt) {
+                showToast('Gunakan menu browser "Tambahkan ke Layar Utama" untuk menginstal.');
+                return;
+            }
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                showToast('MathMaster Pro berhasil diinstal!');
+                document.getElementById('btn-install-pwa').classList.add('hidden');
+            }
+            deferredPrompt = null;
+        }
+
+        /* ===================================================================
+           2. LOCALSTORAGE STATE MANAGEMENT
+        =================================================================== */
+        const STORAGE_KEY = 'mathmaster_pro_state_v1';
+        const defaultState = {
+            xp: 120,
+            readTopics: ['pythagoras'],
+            quizBestScores: {},
+            speedHighScore: 0,
+            puzzleSolved: 0,
+            chatHistory: [
+                {
+                    sender: 'bot',
+                    text: 'Halo! Saya **MathBot AI**. Tanyakan rumus matematika apa saja atau ketik persamaan (contoh: `x^2 - 7x + 12 = 0`, `3x + 5 = 20`, atau `Pythagoras a=5, b=12`) untuk melihat penyelesaian langkah demi langkah!'
+                }
+            ]
+        };
+
+        let appState = loadState();
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return { ...defaultState };
+                return { ...defaultState, ...JSON.parse(raw) };
+            } catch (e) {
+                return { ...defaultState };
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                updateXPDisplay();
+            } catch (e) {}
+        }
+
+        function addXP(points, reason) {
+            appState.xp += points;
+            saveState();
+            if (reason) showToast(`+${points} XP • ${reason}`);
+        }
+
+        function updateXPDisplay() {
+            const el = document.getElementById('header-xp');
+            if (el) el.textContent = `${appState.xp} XP`;
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const msgEl = document.getElementById('toast-message');
+            msgEl.textContent = msg;
+            container.classList.remove('opacity-0', '-translate-y-3');
+            container.classList.add('opacity-100', 'translate-y-0');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => {
+                container.classList.add('opacity-0', '-translate-y-3');
+                container.classList.remove('opacity-100', 'translate-y-0');
+            }, 2600);
+        }
+
+        /* ===================================================================
+           3. ONLINE / OFFLINE NETWORK STATUS MONITOR
+        =================================================================== */
+        function updateNetworkStatus() {
+            const isOnline = navigator.onLine;
+            const badge = document.getElementById('network-badge');
+            const dot = document.getElementById('network-dot');
+            const text = document.getElementById('network-text');
+            const videoAlert = document.getElementById('video-offline-alert');
+            const videoStatus = document.getElementById('video-net-status');
+
+            if (isOnline) {
+                badge.className = 'flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-300/40 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all';
+                dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+                text.textContent = 'Online';
+                if (videoAlert) videoAlert.classList.add('hidden');
+                if (videoStatus) {
+                    videoStatus.className = 'inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 self-start';
+                    videoStatus.innerHTML = '<i data-lucide="wifi" class="w-3.5 h-3.5"></i> Streaming Siap';
+                }
+            } else {
+                badge.className = 'flex items-center gap-1.5 bg-amber-500/25 border border-amber-300/50 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all';
+                dot.className = 'w-2 h-2 rounded-full bg-amber-300';
+                text.textContent = 'Offline';
+                if (videoAlert) videoAlert.classList.remove('hidden');
+                if (videoStatus) {
+                    videoStatus.className = 'inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 self-start';
+                    videoStatus.innerHTML = '<i data-lucide="wifi-off" class="w-3.5 h-3.5"></i> Mode Offline';
+                }
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+        window.addEventListener('online', () => { updateNetworkStatus(); showToast('Kembali terhubung ke internet!'); });
+        window.addEventListener('offline', () => { updateNetworkStatus(); showToast('Mode Offline aktif. Semua materi & fitur tetap berjalan.'); });
+
+        /* ===================================================================
+           4. NAVIGATION & KATEX HELPER
+        =================================================================== */
+        function renderMath(element) {
+            if (window.renderMathInElement && element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false }
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+            const target = document.getElementById(`tab-${tabId}`);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const isSelected = btn.getAttribute('data-nav') === tabId;
+                btn.className = isSelected
+                    ? 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-indigo-600 bg-indigo-50/90 font-bold transition-all'
+                    : 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-indigo-600 font-semibold transition-all';
+            });
+
+            if (tabId === 'materi') renderMath(document.getElementById('materi-content-card'));
+            if (tabId === 'simulasi') renderMath(document.getElementById('sim-steps'));
+            if (tabId === 'quiz') renderMath(document.getElementById('quiz-stage'));
+            if (tabId === 'chatbot') {
+                const box = document.getElementById('chat-messages');
+                box.scrollTop = box.scrollHeight;
+            }
+        }
+
+        /* ===================================================================
+           5. DATA & MODULE 1: MATERI LENGKAP (6 BAB DENGAN LATEX)
+        =================================================================== */
+        const MATERI_DATA = [
+            {
+                id: 'pythagoras',
+                title: 'Pythagoras',
+                icon: 'triangle',
+                subtitle: 'Hubungan Sisi Segitiga Siku-Siku',
+                summary: 'Teorema Pythagoras menyatakan bahwa pada setiap segitiga siku-siku, kuadrat panjang sisi miring (hipotenusa) sama dengan jumlah kuadrat panjang kedua sisi penyikunya.',
+                formulas: [
+                    { label: 'Rumus Utama Hipotenusa', tex: 'c^2 = a^2 + b^2 \\iff c = \\sqrt{a^2 + b^2}' },
+                    { label: 'Mencari Sisi Siku-Siku', tex: 'a = \\sqrt{c^2 - b^2}, \\quad b = \\sqrt{c^2 - a^2}' }
+                ],
+                properties: [
+                    'Berlaku khusus pada segitiga siku-siku (memiliki sudut $90^\\circ$).',
+                    'Sisi $c$ selalu merupakan sisi terpanjang dan berada tepat di depan sudut siku-siku.',
+                    'Tripel Pythagoras populer: $(3, 4, 5)$, $(5, 12, 13)$, $(7, 24, 25)$, dan $(8, 15, 17)$.'
+                ],
+                example: {
+                    question: 'Sebuah tangga sepanjang $13\\text{ meter}$ disandarkan pada dinding vertikal. Jika jarak ujung bawah tangga ke dinding adalah $5\\text{ meter}$, berapa tinggi dinding yang dicapai tangga?',
+                    steps: [
+                        'Diketahui sisi miring $c = 13\\text{ m}$ dan alas $a = 5\\text{ m}$.',
+                        'Gunakan rumus tinggi: $b = \\sqrt{c^2 - a^2}$',
+                        'Substitusi nilai: $b = \\sqrt{13^2 - 5^2} = \\sqrt{169 - 25} = \\sqrt{144} = 12\\text{ meter}$.'
+                    ]
+                }
+            },
+            {
+                id: 'peluang',
+                title: 'Peluang',
+                icon: 'dices',
+                subtitle: 'Probabilitas, Permutasi & Kombinasi',
+                summary: 'Peluang (probabilitas) mengukur seberapa besar kemungkinan suatu kejadian terjadi dibandingkan dengan seluruh kemungkinan hasil dalam ruang sampel.',
+                formulas: [
+                    { label: 'Peluang Kejadian A', tex: 'P(A) = \\frac{n(A)}{n(S)}, \\quad 0 \\le P(A) \\le 1' },
+                    { label: 'Komplemen & Frekuensi Harapan', tex: 'P(A^c) = 1 - P(A), \\quad F_h(A) = P(A) \\times N' },
+                    { label: 'Permutasi & Kombinasi', tex: 'P(n,r) = \\frac{n!}{(n-r)!}, \\quad C(n,r) = \\binom{n}{r} = \\frac{n!}{r!(n-r)!}' }
+                ],
+                properties: [
+                    'Jika $P(A) = 0$, kejadian mustahil terjadi. Jika $P(A) = 1$, kejadian pasti terjadi.',
+                    'Permutasi memperhatikan urutan (contoh: pemilihan ketua & wakil), sedangkan Kombinasi tidak memperhatikan urutan (contoh: pemilihan tim).'
+                ],
+                example: {
+                    question: 'Dalam sebuah kantong terdapat $4$ bola merah dan $6$ bola biru. Jika diambil $1$ bola secara acak, berapa peluang terambilnya bola merah?',
+                    steps: [
+                        'Banyak kejadian bola merah: $n(A) = 4$.',
+                        'Total seluruh bola (ruang sampel): $n(S) = 4 + 6 = 10$.',
+                        'Hitung peluang: $P(A) = \\frac{n(A)}{n(S)} = \\frac{4}{10} = \\frac{2}{5} = 0,4$.'
+                    ]
+                }
+            },
+            {
+                id: 'kuadrat',
+                title: 'Persamaan Kuadrat',
+                icon: 'function-square',
+                subtitle: 'Akar-Akar, Diskriminan & Rumus ABC',
+                summary: 'Persamaan kuadrat adalah persamaan polinomial berorde dua dengan bentuk umum $ax^2 + bx + c = 0$ di mana $a \\ne 0$.',
+                formulas: [
+                    { label: 'Bentuk Umum & Rumus Kuadratik (ABC)', tex: 'ax^2 + bx + c = 0 \\implies x_{1,2} = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}' },
+                    { label: 'Diskriminan & Rumus Vieta', tex: 'D = b^2 - 4ac, \\quad x_1 + x_2 = -\\frac{b}{a}, \\quad x_1 \\cdot x_2 = \\frac{c}{a}' }
+                ],
+                properties: [
+                    '$D > 0$: Persamaan memiliki dua akar real yang berbeda.',
+                    '$D = 0$: Persamaan memiliki dua akar real yang sama (kembar).',
+                    '$D < 0$: Persamaan tidak memiliki akar real (akar imajiner).'
+                ],
+                example: {
+                    question: 'Tentukan akar-akar penyelesaian dari persamaan kuadrat $x^2 - 5x + 6 = 0$.',
+                    steps: [
+                        'Identifikasi koefisien: $a = 1$, $b = -5$, $c = 6$.',
+                        'Cari dua bilangan yang jika dijumlahkan hasilnya $-5$ dan dikalikan hasilnya $6$, yaitu $-2$ dan $-3$.',
+                        'Faktorkan: $(x - 2)(x - 3) = 0 \\implies x_1 = 2$ atau $x_2 = 3$.'
+                    ]
+                }
+            },
+            {
+                id: 'geometri',
+                title: 'Geometri',
+                icon: 'shapes',
+                subtitle: 'Bangun Datar & Bangun Ruang',
+                summary: 'Geometri mempelajari ukuran, bentuk, posisi relatif ruang, serta sifat-sifat luas permukaan dan volume bangun dua dimensi maupun tiga dimensi.',
+                formulas: [
+                    { label: 'Lingkaran (Luas & Keliling)', tex: 'L = \\pi r^2, \\quad K = 2\\pi r' },
+                    { label: 'Tabung (Volume & Luas Permukaan)', tex: 'V = \\pi r^2 t, \\quad L_p = 2\\pi r(r + t)' },
+                    { label: 'Bola (Volume & Luas Permukaan)', tex: 'V = \\frac{4}{3}\\pi r^3, \\quad L_p = 4\\pi r^2' }
+                ],
+                properties: [
+                    'Konstanta $\\pi \\approx 3,14$ atau $\\frac{22}{7}$ untuk jari-jari kelipatan $7$.',
+                    'Volume prisma dan tabung secara umum selalu mengikuti prinsip $V = \\text{Luas Alas} \\times \\text{Tinggi}$.'
+                ],
+                example: {
+                    question: 'Hitunglah volume sebuah tabung yang memiliki jari-jari alas $r = 7\\text{ cm}$ dan tinggi $t = 10\\text{ cm}$ dengan $\\pi = \\frac{22}{7}$.',
+                    steps: [
+                        'Gunakan rumus volume tabung: $V = \\pi r^2 t$.',
+                        'Substitusi nilai: $V = \\frac{22}{7} \\times 7^2 \\times 10 = \\frac{22}{7} \\times 49 \\times 10$.',
+                        'Sederhanakan: $V = 22 \\times 7 \\times 10 = 1.540\\text{ cm}^3$.'
+                    ]
+                }
+            },
+            {
+                id: 'statistika',
+                title: 'Statistika',
+                icon: 'bar-chart-3',
+                subtitle: 'Ukuran Pemusatan & Penyebaran Data',
+                summary: 'Statistika adalah ilmu yang mempelajari cara mengumpulkan, mengolah, menganalisis, serta menarik kesimpulan dari sekumpulan data numerik.',
+                formulas: [
+                    { label: 'Rata-Rata (Mean) Data Tunggal', tex: '\\bar{x} = \\frac{\\sum_{i=1}^{n} x_i}{n} = \\frac{x_1 + x_2 + \\dots + x_n}{n}' },
+                    { label: 'Median (Nilai Tengah Data Terurut)', tex: '\\text{Me} = \\begin{cases} x_{\\frac{n+1}{2}}, & n \\text{ ganjil} \\\\ \\frac{1}{2}\\left(x_{\\frac{n}{2}} + x_{\\frac{n}{2}+1}\\right), & n \\text{ genap} \\end{cases}' }
+                ],
+                properties: [
+                    'Mean sangat sensitif terhadap nilai pencilan (outlier) yang terlalu besar atau terlalu kecil.',
+                    'Modus ($Mo$) adalah nilai yang paling sering muncul dalam suatu himpunan data.'
+                ],
+                example: {
+                    question: 'Diketahui nilai ulangan matematika $5$ siswa adalah: $70, 85, 80, 90, 75$. Tentukan nilai Mean dan Mediannya!',
+                    steps: [
+                        'Urutkan data terlebih dahulu: $70, 75, 80, 85, 90$.',
+                        'Hitung Mean: $\\bar{x} = \\frac{70 + 75 + 80 + 85 + 90}{5} = \\frac{400}{5} = 80$.',
+                        'Karena $n = 5$ (ganjil), Median berada pada data ke-$3$, yaitu $80$.'
+                    ]
+                }
+            },
+            {
+                id: 'trigonometri',
+                title: 'Trigonometri',
+                icon: 'compass',
+                subtitle: 'Perbandingan Sudut & Identitas Dasar',
+                summary: 'Trigonometri mempelajari hubungan antara panjang sisi dan besar sudut pada segitiga serta fungsi periodik gelombang.',
+                formulas: [
+                    { label: 'Perbandingan Trigonometri Dasar (Sindemi, Kosami, Tandesa)', tex: '\\sin\\theta = \\frac{\\text{Depan}}{\\text{Miring}}, \\quad \\cos\\theta = \\frac{\\text{Samping}}{\\text{Miring}}, \\quad \\tan\\theta = \\frac{\\text{Depan}}{\\text{Samping}}' },
+                    { label: 'Identitas Trigonometri Utama', tex: '\\sin^2\\theta + \\cos^2\\theta = 1, \\quad \\tan\\theta = \\frac{\\sin\\theta}{\\cos\\theta}' }
+                ],
+                properties: [
+                    'Nilai sudut istimewa: $\\sin 30^\\circ = \\frac{1}{2}$, $\\sin 45^\\circ = \\frac{1}{2}\\sqrt{2}$, $\\sin 60^\\circ = \\frac{1}{2}\\sqrt{3}$.',
+                    'Kuadran I ($0^\\circ - 90^\\circ$) semua bernilai positif; Kuadran II hanya $\\sin$ positif; Kuadran III hanya $\\tan$ positif; Kuadran IV hanya $\\cos$ positif.'
+                ],
+                example: {
+                    question: 'Sebuah segitiga siku-siku memiliki sudut $\\theta = 30^\\circ$ dan panjang sisi miring $20\\text{ cm}$. Berapa panjang sisi di depan sudut $\\theta$?',
+                    steps: [
+                        'Gunakan perbandingan sinus: $\\sin 30^\\circ = \\frac{\\text{Depan}}{\\text{Miring}}$.',
+                        'Diketahui $\\sin 30^\\circ = \\frac{1}{2}$ dan $\\text{Miring} = 20$.',
+                        '$\\frac{1}{2} = \\frac{\\text{Depan}}{20} \\implies \\text{Depan} = 20 \\times \\frac{1}{2} = 10\\text{ cm}$.'
+                    ]
+                }
+            }
+        ];
+
+        let activeMateriId = 'pythagoras';
+
+        function renderMateriModule() {
+            const pillsContainer = document.getElementById('materi-pills');
+            pillsContainer.innerHTML = MATERI_DATA.map(m => {
+                const isActive = m.id === activeMateriId;
+                const isRead = appState.readTopics.includes(m.id);
+                return `
+                    <button onclick="selectMateri('${m.id}')" class="shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all ${
+                        isActive
+                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-600/20'
+                        : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-300'
+                    }">
+                        <span>${m.title}</span>
+                        ${isRead ? `<i data-lucide="check-circle-2" class="w-3.5 h-3.5 ${isActive ? 'text-amber-300' : 'text-emerald-500'}"></i>` : ''}
+                    </button>
+                `;
+            }).join('');
+
+            const topic = MATERI_DATA.find(m => m.id === activeMateriId) || MATERI_DATA[0];
+            const isRead = appState.readTopics.includes(topic.id);
+
+            const card = document.getElementById('materi-content-card');
+            card.innerHTML = `
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div>
+                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">${topic.subtitle}</span>
+                        <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-1.5">${topic.title}</h3>
+                    </div>
+                    <button onclick="toggleReadMateri('${topic.id}')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all self-start ${
+                        isRead
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200'
+                    }">
+                        <i data-lucide="${isRead ? 'check-circle-2' : 'circle'}" class="w-4 h-4"></i>
+                        <span>${isRead ? 'Selesai Dipelajari' : 'Tandai Selesai'}</span>
+                    </button>
+                </div>
+
+                <p class="text-sm text-slate-600 leading-relaxed">${topic.summary}</p>
+
+                <!-- Rumus LaTeX Box -->
+                <div class="space-y-2.5">
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                        <i data-lucide="sigma" class="w-4 h-4 text-indigo-600"></i> Rumus Utama
+                    </h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        ${topic.formulas.map(f => `
+                            <div class="bg-slate-50 border border-slate-200/90 rounded-xl p-3.5">
+                                <div class="text-[11px] font-bold text-indigo-700 mb-1">${f.label}</div>
+                                <div class="text-base sm:text-lg text-slate-900 overflow-x-auto">$$${f.tex}$$</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Sifat Penting -->
+                <div class="space-y-2">
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                        <i data-lucide="list-checks" class="w-4 h-4 text-indigo-600"></i> Konsep & Sifat Penting
+                    </h4>
+                    <ul class="space-y-2 text-sm text-slate-700">
+                        ${topic.properties.map(p => `
+                            <li class="flex items-start gap-2 bg-white border border-slate-100 p-2.5 rounded-xl">
+                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-600 mt-2 shrink-0"></span>
+                                <span>${p}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+
+                <!-- Contoh Soal Step-by-Step -->
+                <div class="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-4 sm:p-5 space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-0.5 rounded-md bg-indigo-600 text-white text-[11px] font-extrabold uppercase">Contoh Soal</span>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-900 leading-relaxed">${topic.example.question}</p>
+                    <div class="bg-white rounded-xl p-3.5 border border-indigo-100 space-y-2">
+                        <div class="text-xs font-extrabold text-indigo-700 uppercase">Penyelesaian:</div>
+                        ${topic.example.steps.map((st, idx) => `
+                            <div class="text-xs sm:text-sm text-slate-700 flex items-start gap-2">
+                                <span class="font-mono font-bold text-indigo-600">${idx + 1}.</span>
+                                <span>${st}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Update Progress Bar
+            const count = appState.readTopics.length;
+            const pct = Math.round((count / MATERI_DATA.length) * 100);
+            document.getElementById('materi-progress-text').textContent = `${count}/${MATERI_DATA.length}`;
+            document.getElementById('materi-progress-bar').style.width = `${pct}%`;
+
+            if (window.lucide) lucide.createIcons();
+            renderMath(card);
+        }
+
+        function selectMateri(id) {
+            activeMateriId = id;
+            renderMateriModule();
+        }
+
+        function toggleReadMateri(id) {
+            const idx = appState.readTopics.indexOf(id);
+            if (idx === -1) {
+                appState.readTopics.push(id);
+                addXP(30, 'Materi selesai dipelajari');
+            } else {
+                appState.readTopics.splice(idx, 1);
+                saveState();
+            }
+            renderMateriModule();
+        }
+
+        /* ===================================================================
+           6. MODULE 2: SIMULASI KALKULATOR GEOMETRI INTERAKTIF
+        =================================================================== */
+        const SHAPES_CONFIG = {
+            '2d': [
+                {
+                    id: 'persegi', name: 'Persegi',
+                    inputs: [{ key: 's', label: 'Sisi (s)', val: 8, unit: 'cm' }],
+                    svg: (v) => `<svg viewBox="0 0 180 140" class="w-44 h-36">
+                        <rect x="45" y="20" width="90" height="90" rx="4" fill="#e0e7ff" stroke="#4f46e5" stroke-width="3"/>
+                        <text x="90" y="126" text-anchor="middle" fill="#312e81" font-size="12" font-weight="bold">s = ${v.s}</text>
+                        <text x="143" y="70" fill="#312e81" font-size="12" font-weight="bold">s = ${v.s}</text>
+                    </svg>`,
+                    calc: (v) => {
+                        const luas = v.s * v.s;
+                        const kel = 4 * v.s;
+                        return {
+                            metrics: [
+                                { label: 'Luas Persegi', value: `${luas.toFixed(2)} cm²`, color: 'indigo' },
+                                { label: 'Keliling Persegi', value: `${kel.toFixed(2)} cm`, color: 'emerald' }
+                            ],
+                            steps: [
+                                `$L = s^2 = ${v.s}^2 = \\mathbf{${luas.toFixed(2)}\\text{ cm}^2}$`,
+                                `$K = 4 \\times s = 4 \\times ${v.s} = \\mathbf{${kel.toFixed(2)}\\text{ cm}}$`
+                            ]
+                        };
+                    }
+                },
+                {
+                    id: 'persegipanjang', name: 'Persegi Panjang',
+                    inputs: [
+                        { key: 'p', label: 'Panjang (p)', val: 12, unit: 'cm' },
+                        { key: 'l', label: 'Lebar (l)', val: 7, unit: 'cm' }
+                    ],
+                    svg: (v) => `<svg viewBox="0 0 200 140" class="w-48 h-36">
+                        <rect x="30" y="30" width="140" height="75" rx="4" fill="#e0e7ff" stroke="#4f46e5" stroke-width="3"/>
+                        <text x="100" y="122" text-anchor="middle" fill="#312e81" font-size="12" font-weight="bold">p = ${v.p}</text>
+                        <text x="176" y="72" fill="#312e81" font-size="12" font-weight="bold">l = ${v.l}</text>
+                    </svg>`,
+                    calc: (v) => {
+                        const luas = v.p * v.l;
+                        const kel = 2 * (v.p + v.l);
+                        return {
+                            metrics: [
+                                { label: 'Luas', value: `${luas.toFixed(2)} cm²`, color: 'indigo' },
+                                { label: 'Keliling', value: `${kel.toFixed(2)} cm`, color: 'emerald' }
+                            ],
+                            steps: [
+                                `$L = p \\times l = ${v.p} \\times ${v.l} = \\mathbf{${luas.toFixed(2)}\\text{ cm}^2}$`,
+                                `$K = 2(p + l) = 2(${v.p} + ${v.l}) = \\mathbf{${kel.toFixed(2)}\\text{ cm}}$`
+                            ]
+                        };
+                    }
+                },
+                {
+                    id: 'segitiga', name: 'Segitiga Siku',
+                    inputs: [
+                        { key: 'a', label: 'Alas (a)', val: 6, unit: 'cm' },
+                        { key: 't', label: 'Tinggi (t)', val: 8, unit: 'cm' }
+                    ],
+                    svg: (v) => `<svg viewBox="0 0 180 140" class="w-44 h-36">
+                        <polygon points="40,110 140,110 40,25" fill="#e0e7ff" stroke="#4f46e5" stroke-width="3"/>
+                        <text x="90" y="126" text-anchor="middle" fill="#312e81" font-size="12" font-weight="bold">a = ${v.a}</text>
+                        <text x="16" y="72" fill="#312e81" font-size="12" font-weight="bold">t = ${v.t}</text>
+                    </svg>`,
+                    calc: (v) => {
+                        const luas = 0.5 * v.a * v.t;
+                        const miring = Math.sqrt(v.a * v.a + v.t * v.t);
+                        const kel = v.a + v.t + miring;
+                        return {
+                            metrics: [
+                                { label: 'Luas Segitiga', value: `${luas.toFixed(2)} cm²`, color: 'indigo' },
+                                { label: 'Keliling (Siku)', value: `${kel.toFixed(2)} cm`, color: 'emerald' }
+                            ],
+                            steps: [
+                                `$L = \\frac{1}{2} \\times a \\times t = \\frac{1}{2} \\times ${v.a} \\times ${v.t} = \\mathbf{${luas.toFixed(2)}\\text{ cm}^2}$`,
+                                `Sisi miring $c = \\sqrt{${v.a}^2 + ${v.t}^2} = ${miring.toFixed(2)}\\text{ cm}$`,
+                                `$K = a + t + c = \\mathbf{${kel.toFixed(2)}\\text{ cm}}$`
+                            ]
+                        };
+                    }
+                },
+                {
+                    id: 'lingkaran', name: 'Lingkaran',
+                    inputs: [{ key: 'r', label: 'Jari-jari (r)', val: 7, unit: 'cm' }],
+                    svg: (v) => `<svg viewBox="0 0 180 140" class="w-44 h-36">
+                        <circle cx="90" cy="70" r="50" fill="#e0e7ff" stroke="#4f46e5" stroke-width="3"/>
+                        <line x1="90" y1="70" x2="140" y2="70" stroke="#4338ca" stroke-width="2.5" stroke-dasharray="4"/>
+                        <circle cx="90" cy="70" r="3" fill="#312e81"/>
+                        <text x="115" y="63" text-anchor="middle" fill="#312e81" font-size="12" font-weight="bold">r=${v.r}</text>
+                    </svg>`,
+                    calc: (v) => {
+                        const luas = Math.PI * v.r * v.r;
+                        const kel = 2 * Math.PI * v.r;
+                        return {
+                            metrics: [
+                                { label: 'Luas Lingkaran', value: `${luas.toFixed(2)} cm²`, color: 'indigo' },
+                                { label: 'Keliling Lingkaran', value: `${kel.toFixed(2)} cm`, color: 'emerald' }
+                            ],
+                            steps: [
+                                `$L = \\pi r^2 = \\pi \\times ${v.r}^2 \\approx \\mathbf{${luas.toFixed(2)}\\text{ cm}^2}$`,
+                                `$K = 2\\pi r = 2 \\times \\pi \\times ${v.r} \\approx \\mathbf{${kel.toFixed(2)}\\text{ cm}}$`
+                            ]
+                        };
+                    }
+                },
+                {
+                    id: 'trapesium', name: 'Trapesium',
+                    inputs: [
+                        { key: 'a', label: 'Sisi Atas (a)', val: 6, unit: 'cm' },
+                        { key: 'b', label: 'Sisi Bawah (b)', val: 12, unit: 'cm' },
+                        { key: 't', label: 'Tinggi (t)', val: 5, unit: 'cm' }
+                    ],
+                    svg: (v) => `<svg viewBox="0 0 190 140" class="w-44 h-36">
+                        <polygon points="55,30 135,30 165,110 25,110" fill="#e0e7ff" stroke="#4f46e5" stroke-width="3"/>
+                        <text x="95" y="23" text-anchor="middle" fill="#312e81" font-size="11" font-weight="bold">a = ${v.a}</text>
+                        <text x="95" y="126" text-anchor="middle" fill="#312e81" font-size="11" font-weight="bold">b = ${v.b}</text>
+                        <text x="95" y="75" text-anchor="middle" fill="#4338ca" font-size="11" font-weight="bold">t = ${v.t}</text>
+                    </svg>`,
+                    calc: (v) => {
+                        const luas = 0.5 * (v.a + v.b) * v.t;
+                        const sisiMiring = Math.sqrt(Math.pow((v.b - v.a) / 2, 2) + v.t * v.t);
+                        const kel = v.a + v.b + 2 * sisiMiring;
+                        return {
+                            metrics: [
+                                { label: 'Luas Trapesium', value: `${luas.toFixed(2)} cm²`, color: 'indigo' },
+                                { label: 'Keliling (Sama Kaki)', value: `${kel.toFixed(2)} cm`, color: 'emerald' }
+                            ],
+                            steps: [
+                                `$L = \\frac{1}{2}(a + b) \\times t = \\frac{1}{2}(${v.a} + ${v.b}) \\times ${v.t} = \\mathbf{${luas.toFixed(2)}\\text{ cm}^2}$`,
+                                `$K = a + b + 2s \\approx \\mathbf{${kel.toFixed(2)}\\text{ cm}}$`
+                            ]
+                        };
+                    }
+                }
+            ],
+            '3d': [
+                {
+                    id: 'kubus', name: 'Kubus',
+                    inputs: [{ key: 's', label: 'Rusuk (s)', val: 6, unit: 'cm' }],
+                    svg: (v) => `<svg viewBox="0 0 180 140" class="w-44 h-36">
+                        <rect x="45" y="40" width="70" height="70" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2.5"/>
+                        <polygon points="45,40 70,20 140,20 115,40" fill="#c7d2fe" stroke="#4f46e5" stroke-width="2.5"/>
+                        <polygon points="115,40 140,20 140,90 115,110" fill="#a5b4fc" stroke="#4f46e5" stroke-width="2.5"/>
+                        <text x="80" y="126" text-anchor="middle" fill="#312e81" font-size="12" font-weight="bold">s = ${v.s}</text>
+                    </svg>`,
+                    calc: (v) => {
+                        const vol = Math.pow(v.s, 3);
+                        const lp = 6 * v.s * v.s;
+                        return {
+                            metrics: [
+                                { label: 'Volume Kubus', value: `${vol.toFixed(2)} cm³`, color: 'indigo' },
+                                { label: 'Luas Permukaan', value: `${lp.toFixed(2)} cm²`, color: 'emerald' }
+                            ],
+                            steps: [
+                                `$V = s^3 = ${v.s}^3 = \\mathbf{${vol.toFixed(2)}\\text{ cm}^3}$`,
+                                `$L_p = 6s^2 = 6 \\times ${v.s}^2 = \\mathbf{${lp.toFixed(2)}\\text{ cm}^2}$`
+                            ]
+                        };
+                    }
+                },
+                {
+                    id: 'balok', name: 'Balok',
+                    inputs: [
+                        { key: 'p', label: 'Panjang (p)', val: 10, unit: 'cm' },
+                        { key: 'l', label: 'Lebar (l)', val: 5, unit: 'cm' },
+                        { key: 't', label: 'Tinggi (t)', val: 4, unit: 'cm' }
+                    ],
+                    svg: (v) => `<svg viewBox="0 0 190 140" class="w-44 h-36">
+                        <rect x="30" y="45" width="105" height="65" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2.5"/>
+                        <polygon points="30,45 55,25 160,25 135,45" fill="#c7d2fe" stroke="#4f46e5" stroke-width="2.5"/>
+                        <polygon points="135,45 160,25 160,90 135,110" fill="#a5b4fc" stroke="#4f46e5" stroke-width="2.5"/>
+                        <text x="82" y="125" text-anchor="middle" fill="#312e81" font-size="11" font-weight="bold">p=${v.p}, l=${v.l}, t=${v.t}</text>
+                    </svg>`,
+                    calc: (v) => {
+                        const vol = v.p * v.l * v.t;
+                        const lp = 2 * (v.p * v.l + v.p * v.t + v.l * v.t);
+                        return {
+                            metrics: [
+                                { label: 'Volume Balok', value: `${vol.toFixed(2)} cm³`, color: 'indigo' },
+                                { label: 'Luas Permukaan', value: `${lp.toFixed(2)} cm²`, color: 'emerald' }
+                            ],
+                            steps: [
+                                `$V = p \\times l \\times t = ${v.p} \\times ${v.l} \\times ${v.t} = \\mathbf{${vol.toFixed(2)}\\text{ cm}^3}$`,
+                                `$L_p = 2(pl + pt + lt) = \\mathbf{${lp.toFixed(2)}\\text{ cm}^2}$`
+                            ]
+                        };
+                    }
+                },
+                {
+                    id: 'tabung', name: 'Tabung',
+                    inputs: [
+                        { key: 'r', label: 'Jari-jari (r)', val: 7, unit: 'cm' },
+                        { key: 't', label: 'Tinggi (t)', val: 10, unit: 'cm' }
+                    ],
+                    svg: (v) => `<svg viewBox="0 0 180 140" class="w-44 h-36">
+                        <rect x="55" y="30" width="70" height="80" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2.5"/>
+                        <ellipse cx="90" cy="30" rx="35" ry="12" fill="#c7d2fe" stroke="#4f46e5" stroke-width="2.5"/>
+                        <ellipse cx="90" cy="110" rx="35" ry="12" fill="#a5b4fc" stroke="#4f46e5" stroke-width="2.5"/>
+                        <text x="142" y="75" fill="#312e81" font-size="11" font-weight="bold">t=${v.t}</text>
+                        <text x="90" y="135" text-anchor="middle" fill="#312e81" font-size="11" font-weight="bold">r=${v.r}</text>
+                    </svg>`,
+                    calc: (v) => {
+                        const vol = Math.PI * v.r * v.r * v.t;
+                        const lp = 2 * Math.PI * v.r * (v.r + v.t);
+                        return {
+                            metrics: [
+                                { label: 'Volume Tabung', value: `${vol.toFixed(2)} cm³`, color: 'indigo' },
+                                { label: 'Luas Permukaan', value: `${lp.toFixed(2)} cm²`, color: 'emerald' }
+                            ],
+                            steps: [
+                                `$V = \\pi r^2 t = \\pi \\times ${v.r}^2 \\times ${v.t} \\approx \\mathbf{${vol.toFixed(2)}\\text{ cm}^3}$`,
+                                `$L_p = 2\\pi r(r + t) = 2\\pi(${v.r})(${v.r} + ${v.t}) \\approx \\mathbf{${lp.toFixed(2)}\\text{ cm}^2}$`
+                            ]
+                        };
+                    }
+                },
+                {
+                    id: 'kerucut', name: 'Kerucut',
+                    inputs: [
+                        { key: 'r', label: 'Jari-jari (r)', val: 6, unit: 'cm' },
+                        { key: 't', label: 'Tinggi (t)', val: 8, unit: 'cm' }
+                    ],
+                    svg: (v) => `<svg viewBox="0 0 180 140" class="w-44 h-36">
+                        <polygon points="90,20 45,105 135,105" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2.5"/>
+                        <ellipse cx="90" cy="105" rx="45" ry="13" fill="#c7d2fe" stroke="#4f46e5" stroke-width="2.5"/>
+                        <line x1="90" y1="20" x2="90" y2="105" stroke="#312e81" stroke-dasharray="3"/>
+                        <text x="90" y="133" text-anchor="middle" fill="#312e81" font-size="11" font-weight="bold">r=${v.r}, t=${v.t}</text>
+                    </svg>`,
+                    calc: (v) => {
+                        const s = Math.sqrt(v.r * v.r + v.t * v.t);
+                        const vol = (1 / 3) * Math.PI * v.r * v.r * v.t;
+                        const lp = Math.PI * v.r * (v.r + s);
+                        return {
+                            metrics: [
+                                { label: 'Volume Kerucut', value: `${vol.toFixed(2)} cm³`, color: 'indigo' },
+                                { label: 'Luas Permukaan', value: `${lp.toFixed(2)} cm²`, color: 'emerald' }
+                            ],
+                            steps: [
+                                `Garis pelukis $s = \\sqrt{r^2 + t^2} = \\sqrt{${v.r}^2 + ${v.t}^2} = ${s.toFixed(2)}\\text{ cm}$`,
+                                `$V = \\frac{1}{3}\\pi r^2 t \\approx \\mathbf{${vol.toFixed(2)}\\text{ cm}^3}$`,
+                                `$L_p = \\pi r(r + s) \\approx \\mathbf{${lp.toFixed(2)}\\text{ cm}^2}$`
+                            ]
+                        };
+                    }
+                },
+                {
+                    id: 'bola', name: 'Bola',
+                    inputs: [{ key: 'r', label: 'Jari-jari (r)', val: 7, unit: 'cm' }],
+                    svg: (v) => `<svg viewBox="0 0 180 140" class="w-44 h-36">
+                        <circle cx="90" cy="70" r="48" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2.5"/>
+                        <ellipse cx="90" cy="70" rx="48" ry="15" fill="none" stroke="#6366f1" stroke-width="1.8" stroke-dasharray="4"/>
+                        <text x="90" y="133" text-anchor="middle" fill="#312e81" font-size="12" font-weight="bold">r = ${v.r}</text>
+                    </svg>`,
+                    calc: (v) => {
+                        const vol = (4 / 3) * Math.PI * Math.pow(v.r, 3);
+                        const lp = 4 * Math.PI * v.r * v.r;
+                        return {
+                            metrics: [
+                                { label: 'Volume Bola', value: `${vol.toFixed(2)} cm³`, color: 'indigo' },
+                                { label: 'Luas Permukaan', value: `${lp.toFixed(2)} cm²`, color: 'emerald' }
+                            ],
+                            steps: [
+                                `$V = \\frac{4}{3}\\pi r^3 = \\frac{4}{3}\\pi(${v.r})^3 \\approx \\mathbf{${vol.toFixed(2)}\\text{ cm}^3}$`,
+                                `$L_p = 4\\pi r^2 = 4\\pi(${v.r})^2 \\approx \\mathbf{${lp.toFixed(2)}\\text{ cm}^2}$`
+                            ]
+                        };
+                    }
+                }
+            ]
+        };
+
+        let simCategory = '2d';
+        let simShapeId = 'persegi';
+        let simValues = {};
+
+        function setSimCategory(cat) {
+            simCategory = cat;
+            simShapeId = SHAPES_CONFIG[cat][0].id;
+            document.getElementById('sim-mode-2d').className = cat === '2d'
+                ? 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-sm'
+                : 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-900';
+            document.getElementById('sim-mode-3d').className = cat === '3d'
+                ? 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-sm'
+                : 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-900';
+            initSimShape();
+        }
+
+        function selectSimShape(id) {
+            simShapeId = id;
+            initSimShape();
+        }
+
+        function initSimShape() {
+            const list = SHAPES_CONFIG[simCategory];
+            const btnContainer = document.getElementById('sim-shape-buttons');
+            btnContainer.innerHTML = list.map(s => `
+                <button onclick="selectSimShape('${s.id}')" class="px-3 py-2 rounded-xl text-xs font-bold border transition-all text-center ${
+                    s.id === simShapeId
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-indigo-300'
+                }">
+                    ${s.name}
+                </button>
+            `).join('');
+
+            const shape = list.find(s => s.id === simShapeId) || list[0];
+            simValues = {};
+            shape.inputs.forEach(inp => { simValues[inp.key] = inp.val; });
+
+            document.getElementById('sim-shape-title').textContent = shape.name;
+            const inputsContainer = document.getElementById('sim-inputs');
+            inputsContainer.innerHTML = shape.inputs.map(inp => `
+                <div>
+                    <div class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                        <label for="sim-inp-${inp.key}">${inp.label}</label>
+                        <span class="text-indigo-600 font-mono">${inp.unit}</span>
+                    </div>
+                    <input id="sim-inp-${inp.key}" type="number" min="0.1" step="0.5" value="${inp.val}"
+                        oninput="updateSimValue('${inp.key}', this.value)"
+                        class="w-full bg-white border border-slate-300 focus:border-indigo-600 rounded-xl px-3 py-2 text-sm font-mono font-bold text-slate-900 outline-none">
+                </div>
+            `).join('');
+
+            computeSimulation();
+        }
+
+        function updateSimValue(key, rawVal) {
+            const num = parseFloat(rawVal);
+            simValues[key] = isNaN(num) || num <= 0 ? 0.1 : num;
+            computeSimulation();
+        }
+
+        function computeSimulation() {
+            const shape = SHAPES_CONFIG[simCategory].find(s => s.id === simShapeId);
+            if (!shape) return;
+
+            document.getElementById('sim-svg-container').innerHTML = shape.svg(simValues);
+            const result = shape.calc(simValues);
+
+            document.getElementById('sim-results-cards').innerHTML = result.metrics.map(m => `
+                <div class="bg-${m.color}-600 text-white rounded-2xl p-4 shadow-md shadow-${m.color}-600/15">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-white/80 block">${m.label}</span>
+                    <span class="font-mono text-xl sm:text-2xl font-extrabold mt-1 block">${m.value}</span>
+                </div>
+            `).join('');
+
+            const stepsEl = document.getElementById('sim-steps');
+            stepsEl.innerHTML = result.steps.map(st => `<div class="bg-white px-3 py-2 rounded-xl border border-indigo-100">${st}</div>`).join('');
+            renderMath(stepsEl);
+        }
+
+        /* ===================================================================
+           7. MODULE 3: QUIZ INTERAKTIF PER MATERI + SKOR + PEMBAHASAN
+        =================================================================== */
+        const QUIZ_BANK = {
+            pythagoras: [
+                {
+                    q: 'Sebuah segitiga siku-siku memiliki panjang sisi siku-siku $9\\text{ cm}$ dan $12\\text{ cm}$. Berapa panjang sisi miringnya?',
+                    options: ['$14\\text{ cm}$', '$15\\text{ cm}$', '$18\\text{ cm}$', '$21\\text{ cm}$'],
+                    answer: 1,
+                    explanation: 'Gunakan rumus $c = \\sqrt{a^2 + b^2} = \\sqrt{9^2 + 12^2} = \\sqrt{81 + 144} = \\sqrt{225} = 15\\text{ cm}$.'
+                },
+                {
+                    q: 'Manakah kelompok bilangan berikut yang merupakan Tripel Pythagoras?',
+                    options: ['$(4, 5, 6)$', '$(6, 8, 12)$', '$(8, 15, 17)$', '$(5, 10, 13)$'],
+                    answer: 2,
+                    explanation: 'Cek kuadrat sisi terpanjang: $8^2 + 15^2 = 64 + 225 = 289$, dan $17^2 = 289$. Karena sama, $(8, 15, 17)$ adalah Tripel Pythagoras.'
+                },
+                {
+                    q: 'Panjang diagonal sebuah persegi panjang adalah $25\\text{ cm}$ dan panjangnya $24\\text{ cm}$. Lebar persegi panjang tersebut adalah...',
+                    options: ['$5\\text{ cm}$', '$7\\text{ cm}$', '$9\\text{ cm}$', '$11\\text{ cm}$'],
+                    answer: 1,
+                    explanation: '$l = \\sqrt{25^2 - 24^2} = \\sqrt{625 - 576} = \\sqrt{49} = 7\\text{ cm}$.'
+                }
+            ],
+            peluang: [
+                {
+                    q: 'Sebuah dadu bersisi enam dilempar sekali. Peluang munculnya mata dadu bilangan prima adalah...',
+                    options: ['$\\frac{1}{6}$', '$\\frac{1}{3}$', '$\\frac{1}{2}$', '$\\frac{2}{3}$'],
+                    answer: 2,
+                    explanation: 'Mata dadu prima adalah $\\{2, 3, 5\\}$ sehingga $n(A) = 3$. Ruang sampel $n(S) = 6$. Maka $P(A) = \\frac{3}{6} = \\frac{1}{2}$.'
+                },
+                {
+                    q: 'Dua buah uang logam dilempar bersamaan. Peluang munculnya keduanya gambar (GG) adalah...',
+                    options: ['$\\frac{1}{4}$', '$\\frac{1}{2}$', '$\\frac{3}{4}$', '$1$'],
+                    answer: 0,
+                    explanation: 'Ruang sampel $S = \\{AA, AG, GA, GG\\}$ ($n(S)=4$). Kejadian $GG$ hanya ada $1$, sehingga $P(GG) = \\frac{1}{4}$.'
+                },
+                {
+                    q: 'Jika peluang hujan hari ini adalah $0,35$, maka peluang tidak hujan hari ini adalah...',
+                    options: ['$0,35$', '$0,55$', '$0,65$', '$0,75$'],
+                    answer: 2,
+                    explanation: 'Gunakan aturan komplemen: $P(A^c) = 1 - P(A) = 1 - 0,35 = 0,65$.'
+                }
+            ],
+            kuadrat: [
+                {
+                    q: 'Akar-akar dari persamaan kuadrat $x^2 + 7x + 12 = 0$ adalah...',
+                    options: ['$x = 3$ dan $x = 4$', '$x = -3$ dan $x = -4$', '$x = -2$ dan $x = -6$', '$x = 2$ dan $x = 6$'],
+                    answer: 1,
+                    explanation: 'Faktorkan $(x + 3)(x + 4) = 0$, sehingga diperoleh $x_1 = -3$ dan $x_2 = -4$.'
+                },
+                {
+                    q: 'Nilai diskriminan ($D$) dari persamaan $2x^2 - 4x + 2 = 0$ adalah...',
+                    options: ['$-8$', '$0$', '$8$', '$16$'],
+                    answer: 1,
+                    explanation: '$D = b^2 - 4ac = (-4)^2 - 4(2)(2) = 16 - 16 = 0$ (memiliki akar kembar).'
+                },
+                {
+                    q: 'Jika $x_1$ dan $x_2$ akar-akar dari $x^2 - 8x + 15 = 0$, maka nilai $x_1 + x_2$ adalah...',
+                    options: ['$-8$', '$8$', '$15$', '$-15$'],
+                    answer: 1,
+                    explanation: 'Berdasarkan rumus Vieta, $x_1 + x_2 = -\\frac{b}{a} = -\\frac{-8}{1} = 8$.'
+                }
+            ],
+            geometri: [
+                {
+                    q: 'Luas sebuah lingkaran dengan diameter $14\\text{ cm}$ ($\\pi = \\frac{22}{7}$) adalah...',
+                    options: ['$44\\text{ cm}^2$', '$88\\text{ cm}^2$', '$154\\text{ cm}^2$', '$616\\text{ cm}^2$'],
+                    answer: 2,
+                    explanation: 'Jari-jari $r = \\frac{14}{2} = 7\\text{ cm}$. Luas $L = \\frac{22}{7} \\times 7^2 = 22 \\times 7 = 154\\text{ cm}^2$.'
+                },
+                {
+                    q: 'Sebuah kubus memiliki luas permukaan $294\\text{ cm}^2$. Panjang rusuk kubus tersebut adalah...',
+                    options: ['$6\\text{ cm}$', '$7\\text{ cm}$', '$8\\text{ cm}$', '$9\\text{ cm}$'],
+                    answer: 1,
+                    explanation: '$L_p = 6s^2 \\implies 294 = 6s^2 \\implies s^2 = 49 \\implies s = 7\\text{ cm}$.'
+                },
+                {
+                    q: 'Volume kerucut dengan jari-jari $3\\text{ cm}$ dan tinggi $7\\text{ cm}$ ($\\pi = \\frac{22}{7}$) adalah...',
+                    options: ['$44\\text{ cm}^3$', '$66\\text{ cm}^3$', '$132\\text{ cm}^3$', '$198\\text{ cm}^3$'],
+                    answer: 1,
+                    explanation: '$V = \\frac{1}{3}\\pi r^2 t = \\frac{1}{3} \\times \\frac{22}{7} \\times 9 \\times 7 = 22 \\times 3 = 66\\text{ cm}^3$.'
+                }
+            ],
+            statistika: [
+                {
+                    q: 'Nilai rata-rata (Mean) dari data: $6, 8, 7, 9, 10$ adalah...',
+                    options: ['$7,5$', '$8,0$', '$8,5$', '$9,0$'],
+                    answer: 1,
+                    explanation: '$\\bar{x} = \\frac{6 + 8 + 7 + 9 + 10}{5} = \\frac{40}{5} = 8,0$.'
+                },
+                {
+                    q: 'Median dari data: $12, 15, 10, 18, 14, 20$ adalah...',
+                    options: ['$14$', '$14,5$', '$15$', '$16$'],
+                    answer: 1,
+                    explanation: 'Urutkan data: $10, 12, 14, 15, 18, 20$. Median adalah rata-rata data ke-3 dan ke-4: $\\frac{14 + 15}{2} = 14,5$.'
+                },
+                {
+                    q: 'Modus dari kumpulan data: $5, 7, 6, 7, 8, 5, 7, 9$ adalah...',
+                    options: ['$5$', '$6$', '$7$', '$8$'],
+                    answer: 2,
+                    explanation: 'Angka $7$ muncul paling banyak ($3$ kali), sehingga modusnya adalah $7$.'
+                }
+            ],
+            trigonometri: [
+                {
+                    q: 'Nilai dari $\\sin 30^\\circ + \\cos 60^\\circ$ adalah...',
+                    options: ['$0$', '$\\frac{1}{2}$', '$1$', '$\\sqrt{3}$'],
+                    answer: 2,
+                    explanation: 'Diketahui $\\sin 30^\\circ = \\frac{1}{2}$ dan $\\cos 60^\\circ = \\frac{1}{2}$. Jadi $\\frac{1}{2} + \\frac{1}{2} = 1$.'
+                },
+                {
+                    q: 'Jika $\\sin\\theta = \\frac{3}{5}$ pada sudut lancip $\\theta$, maka nilai $\\cos\\theta$ adalah...',
+                    options: ['$\\frac{3}{4}$', '$\\frac{4}{5}$', '$\\frac{5}{4}$', '$\\frac{4}{3}$'],
+                    answer: 1,
+                    explanation: 'Dengan sisi depan $= 3$ dan miring $= 5$, sisi samping $= \\sqrt{5^2 - 3^2} = 4$. Maka $\\cos\\theta = \\frac{4}{5}$.'
+                },
+                {
+                    q: 'Nilai dari $\\tan 45^\\circ$ adalah...',
+                    options: ['$0$', '$\\frac{1}{2}\\sqrt{2}$', '$1$', '$\\sqrt{3}$'],
+                    answer: 2,
+                    explanation: '$\\tan 45^\\circ = \\frac{\\sin 45^\\circ}{\\cos 45^\\circ} = 1$.'
+                }
+            ]
+        };
+
+        let activeQuizTopic = 'pythagoras';
+        let quizIndex = 0;
+        let quizScore = 0;
+        let quizSelectedOption = null;
+        let quizFinished = false;
+
+        function renderQuizModule() {
+            const pills = document.getElementById('quiz-topic-pills');
+            pills.innerHTML = MATERI_DATA.map(m => `
+                <button onclick="selectQuizTopic('${m.id}')" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all ${
+                    m.id === activeQuizTopic
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-indigo-300'
+                }">
+                    ${m.title}
+                </button>
+            `).join('');
+
+            const best = appState.quizBestScores[activeQuizTopic] || 0;
+            document.getElementById('quiz-best-score').textContent = `${best}%`;
+
+            const questions = QUIZ_BANK[activeQuizTopic];
+            const stage = document.getElementById('quiz-stage');
+
+            if (quizFinished) {
+                const finalPct = Math.round((quizScore / questions.length) * 100);
+                stage.innerHTML = `
+                    <div class="text-center py-6 space-y-4">
+                        <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto text-3xl">
+                            🏆
+                        </div>
+                        <div>
+                            <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Hasil Quiz ${activeQuizTopic.toUpperCase()}</span>
+                            <h3 class="text-3xl font-extrabold text-slate-900 mt-1">${finalPct}%</h3>
+                            <p class="text-xs text-slate-500 mt-1">Kamu menjawab benar <strong>${quizScore}</strong> dari <strong>${questions.length}</strong> soal.</p>
+                        </div>
+                        <button onclick="restartQuiz()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-md transition-all">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Ulangi Quiz Ini
+                        </button>
+                    </div>
+                `;
+                if (window.lucide) lucide.createIcons();
+                return;
+            }
+
+            const currentQ = questions[quizIndex];
+            const isAnswered = quizSelectedOption !== null;
+
+            stage.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between text-xs font-bold text-slate-500">
+                        <span>Pertanyaan ${quizIndex + 1} dari ${questions.length}</span>
+                        <span class="text-indigo-600">Skor Sementara: ${quizScore}</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-indigo-600 transition-all" style="width: ${((quizIndex + 1) / questions.length) * 100}%"></div>
+                    </div>
+
+                    <p class="text-sm sm:text-base font-bold text-slate-900 leading-relaxed pt-1">${currentQ.q}</p>
+
+                    <div class="space-y-2.5">
+                        ${currentQ.options.map((opt, idx) => {
+                            let btnClass = 'bg-slate-50 hover:bg-indigo-50/70 border-slate-200 text-slate-800';
+                            if (isAnswered) {
+                                if (idx === currentQ.answer) {
+                                    btnClass = 'bg-emerald-50 border-emerald-500 text-emerald-900 ring-2 ring-emerald-500/20';
+                                } else if (idx === quizSelectedOption) {
+                                    btnClass = 'bg-rose-50 border-rose-500 text-rose-900';
+                                } else {
+                                    btnClass = 'bg-slate-50 border-slate-200 text-slate-400 opacity-70';
+                                }
+                            }
+                            return `
+                                <button ${isAnswered ? 'disabled' : ''} onclick="answerQuiz(${idx})" class="w-full text-left p-3.5 rounded-xl border text-xs sm:text-sm font-semibold transition-all flex items-center justify-between ${btnClass}">
+                                    <span>${opt}</span>
+                                    ${isAnswered && idx === currentQ.answer ? '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0"></i>' : ''}
+                                    ${isAnswered && idx === quizSelectedOption && idx !== currentQ.answer ? '<i data-lucide="x-circle" class="w-4 h-4 text-rose-600 shrink-0"></i>' : ''}
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    ${isAnswered ? `
+                        <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 space-y-1.5">
+                            <div class="text-xs font-extrabold uppercase text-indigo-700 flex items-center gap-1.5">
+                                <i data-lucide="lightbulb" class="w-4 h-4"></i> Pembahasan Lengkap
+                            </div>
+                            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">${currentQ.explanation}</p>
+                        </div>
+                        <div class="flex justify-end">
+                            <button onclick="nextQuizQuestion()" class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-md transition-all">
+                                <span>${quizIndex + 1 < questions.length ? 'Soal Berikutnya' : 'Lihat Hasil Akhir'}</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            if (window.lucide) lucide.createIcons();
+            renderMath(stage);
+        }
+
+        function selectQuizTopic(topicId) {
+            activeQuizTopic = topicId;
+            restartQuiz();
+        }
+
+        function restartQuiz() {
+            quizIndex = 0;
+            quizScore = 0;
+            quizSelectedOption = null;
+            quizFinished = false;
+            renderQuizModule();
+        }
+
+        function answerQuiz(optIdx) {
+            if (quizSelectedOption !== null) return;
+            quizSelectedOption = optIdx;
+            const currentQ = QUIZ_BANK[activeQuizTopic][quizIndex];
+            if (optIdx === currentQ.answer) {
+                quizScore++;
+                addXP(20, 'Jawaban quiz benar!');
+            }
+            renderQuizModule();
+        }
+
+        function nextQuizQuestion() {
+            const questions = QUIZ_BANK[activeQuizTopic];
+            if (quizIndex + 1 < questions.length) {
+                quizIndex++;
+                quizSelectedOption = null;
+            } else {
+                quizFinished = true;
+                const pct = Math.round((quizScore / questions.length) * 100);
+                const prevBest = appState.quizBestScores[activeQuizTopic] || 0;
+                if (pct > prevBest) {
+                    appState.quizBestScores[activeQuizTopic] = pct;
+                    saveState();
+                }
+            }
+            renderQuizModule();
+        }
+
+        /* ===================================================================
+           8. MODULE 4: VIDEO EMBED YOUTUBE PLAYLIST
+        =================================================================== */
+        const VIDEO_LIST = [
+            { id: '_YjodsEa3cM', topic: 'Pythagoras', title: 'Konsep Dasar Teorema Pythagoras & Pembuktiannya', duration: '02:43' },
+            { id: 'GUV4D1hJKrA', topic: 'Peluang', title: 'Definisi Peluang, Komplemen Kejadian dan Frekuensi Harapan', duration: '16:44' },
+            { id: 'I6Re3MwyzF0', topic: 'Persamaan Kuadrat', title: 'Persamaan Kuadrat dan Penyelesaian Persamaan Kuadrat (Memfaktorkan, Kuadrat Sempurna, Rumus ABC)', duration: '17:52' },
+            { id: 'XrdlZ2mBaoM', topic: 'Geometri', title: 'Bangun Ruang Sisi Lengkung Lengkap', duration: '12:26' },
+            { id: 'Aabs-e6afWo', topic: 'Statistika', title: 'Cara Menentukan Mean, Median, DAN Modus Data Kelompok', duration: '09:48' },
+            { id: 'gFEDnmF1V10', topic: 'Trigonometri', title: 'Pengantar Trigonometri: Sin, Cos, Tan & Sudut Istimewa', duration: '06:24' }
+        ];
+
+        let activeVideoId = VIDEO_LIST[0].id;
+
+        function renderVideoPlaylist() {
+            const container = document.getElementById('video-playlist');
+            container.innerHTML = VIDEO_LIST.map(v => {
+                const isPlaying = v.id === activeVideoId;
+                return `
+                    <button onclick="playVideo('${v.id}')" class="flex items-start gap-3 p-3 rounded-xl border text-left transition-all ${
+                        isPlaying
+                        ? 'bg-indigo-50 border-indigo-500 ring-1 ring-indigo-500/30'
+                        : 'bg-slate-50 hover:bg-white border-slate-200'
+                    }">
+                        <div class="w-10 h-10 rounded-xl ${isPlaying ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-600 border border-slate-200'} flex items-center justify-center shrink-0 mt-0.5">
+                            <i data-lucide="${isPlaying ? 'volume-2' : 'play'}" class="w-4 h-4"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600">${v.topic}</span>
+                                <span class="text-[10px] font-mono text-slate-400">${v.duration}</span>
+                            </div>
+                            <p class="text-xs font-bold text-slate-900 line-clamp-2 mt-0.5">${v.title}</p>
+                        </div>
+                    </button>
+                `;
+            }).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function playVideo(vidId) {
+            const video = VIDEO_LIST.find(v => v.id === vidId);
+            if (!video) return;
+            activeVideoId = vidId;
+            document.getElementById('youtube-player').src = `https://www.youtube.com/embed/${vidId}?autoplay=1`;
+            document.getElementById('active-video-topic').textContent = video.topic;
+            document.getElementById('active-video-title').textContent = video.title;
+            document.getElementById('active-video-duration').textContent = video.duration;
+            renderVideoPlaylist();
+        }
+
+        /* ===================================================================
+           9. MODULE 5: GAME MATEMATIKA (HITUNG CEPAT & MAGIC SQUARE)
+        =================================================================== */
+        function switchGame(type) {
+            const isSpeed = type === 'speed';
+            document.getElementById('game-speed-container').classList.toggle('hidden', !isSpeed);
+            document.getElementById('game-puzzle-container').classList.toggle('hidden', isSpeed);
+
+            document.getElementById('game-tab-speed').className = isSpeed
+                ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-sm'
+                : 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-900';
+            document.getElementById('game-tab-puzzle').className = !isSpeed
+                ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-sm'
+                : 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-900';
+        }
+
+        // --- Game 1: Speed Math ---
+        let speedTimerInterval = null;
+        let speedTimeLeft = 60;
+        let speedScore = 0;
+        let speedCombo = 1;
+        let speedCorrectAnswer = 0;
+
+        function startSpeedGame() {
+            speedTimeLeft = 60;
+            speedScore = 0;
+            speedCombo = 1;
+            document.getElementById('speed-score').textContent = '0';
+            document.getElementById('speed-timer').textContent = '60s';
+            document.getElementById('speed-combo-badge').textContent = 'Kombo 1x';
+            document.getElementById('speed-start-screen').classList.add('hidden');
+            document.getElementById('speed-play-screen').classList.remove('hidden');
+
+            nextSpeedQuestion();
+            clearInterval(speedTimerInterval);
+            speedTimerInterval = setInterval(() => {
+                speedTimeLeft--;
+                document.getElementById('speed-timer').textContent = `${speedTimeLeft}s`;
+                if (speedTimeLeft <= 0) {
+                    stopSpeedGame(false);
+                }
+            }, 1000);
+        }
+
+        function stopSpeedGame(manual) {
+            clearInterval(speedTimerInterval);
+            document.getElementById('speed-play-screen').classList.add('hidden');
+            document.getElementById('speed-start-screen').classList.remove('hidden');
+            if (!manual && speedScore > 0) {
+                if (speedScore > appState.speedHighScore) {
+                    appState.speedHighScore = speedScore;
+                    document.getElementById('speed-highscore').textContent = speedScore;
+                }
+                addXP(Math.min(50, Math.floor(speedScore / 10)), `Skor Hitung Cepat: ${speedScore}`);
+            }
+        }
+
+        function nextSpeedQuestion() {
+            const ops = ['+', '-', '×', '²'];
+            const op = ops[Math.floor(Math.random() * ops.length)];
+            let qText = '', ans = 0;
+
+            if (op === '+') {
+                const a = Math.floor(Math.random() * 45) + 12;
+                const b = Math.floor(Math.random() * 45) + 11;
+                qText = `${a} + ${b} = ?`;
+                ans = a + b;
+            } else if (op === '-') {
+                const a = Math.floor(Math.random() * 50) + 30;
+                const b = Math.floor(Math.random() * 29) + 5;
+                qText = `${a} − ${b} = ?`;
+                ans = a - b;
+            } else if (op === '×') {
+                const a = Math.floor(Math.random() * 12) + 4;
+                const b = Math.floor(Math.random() * 11) + 3;
+                qText = `${a} × ${b} = ?`;
+                ans = a * b;
+            } else {
+                const a = Math.floor(Math.random() * 11) + 4;
+                qText = `${a}² = ?`;
+                ans = a * a;
+            }
+
+            speedCorrectAnswer = ans;
+            document.getElementById('speed-question').textContent = qText;
+
+            // Generate 3 distinct distractors
+            const opts = new Set([ans]);
+            while (opts.size < 4) {
+                const offset = (Math.floor(Math.random() * 9) + 1) * (Math.random() < 0.5 ? -1 : 1);
+                if (ans + offset > 0) opts.add(ans + offset);
+            }
+            const shuffled = Array.from(opts).sort(() => Math.random() - 0.5);
+
+            document.getElementById('speed-options').innerHTML = shuffled.map(val => `
+                <button onclick="submitSpeedAnswer(${val})" class="bg-slate-100 hover:bg-indigo-600 hover:text-white active:scale-95 text-slate-900 font-mono font-extrabold text-xl py-4 rounded-2xl border border-slate-200 transition-all">
+                    ${val}
+                </button>
+            `).join('');
+        }
+
+        function submitSpeedAnswer(val) {
+            if (val === speedCorrectAnswer) {
+                speedScore += 10 * speedCombo;
+                speedCombo = Math.min(5, speedCombo + 1);
+            } else {
+                speedCombo = 1;
+            }
+            document.getElementById('speed-score').textContent = speedScore;
+            document.getElementById('speed-combo-badge').textContent = `Kombo ${speedCombo}x`;
+            nextSpeedQuestion();
+        }
+
+        // --- Game 2: Magic Square 3x3 Puzzle ---
+        let magicSolution = [];
+        let magicMaskedIndices = [];
+
+        function generateMagicPuzzle() {
+            // Base 3x3 Lo Shu Magic Square transformed by random scale & shift
+            const base = [8, 1, 6, 3, 5, 7, 4, 9, 2];
+            const mult = Math.floor(Math.random() * 3) + 1;
+            const add = Math.floor(Math.random() * 5);
+            magicSolution = base.map(n => n * mult + add);
+
+            const targetSum = magicSolution[0] + magicSolution[1] + magicSolution[2];
+            document.getElementById('puzzle-target').textContent = targetSum;
+
+            // Hide 4 random cells
+            const indices = [0, 1, 2, 3, 4, 5, 6, 7, 8].sort(() => Math.random() - 0.5);
+            magicMaskedIndices = indices.slice(0, 4);
+
+            const grid = document.getElementById('magic-grid');
+            grid.innerHTML = magicSolution.map((val, idx) => {
+                if (magicMaskedIndices.includes(idx)) {
+                    return `<input id="magic-cell-${idx}" type="number" placeholder="?" class="w-full aspect-square text-center font-mono font-extrabold text-lg sm:text-xl bg-white text-indigo-700 border-2 border-indigo-400 focus:border-indigo-700 rounded-xl outline-none">`;
+                }
+                return `<div class="w-full aspect-square flex items-center justify-center font-mono font-extrabold text-lg sm:text-xl bg-indigo-600 text-white rounded-xl shadow-sm">${val}</div>`;
+            }).join('');
+
+            const fb = document.getElementById('puzzle-feedback');
+            fb.classList.add('hidden');
+        }
+
+        function checkMagicPuzzle() {
+            const current = magicSolution.map((val, idx) => {
+                if (magicMaskedIndices.includes(idx)) {
+                    const inp = document.getElementById(`magic-cell-${idx}`);
+                    return parseInt(inp.value, 10);
+                }
+                return val;
+            });
+
+            const fb = document.getElementById('puzzle-feedback');
+            fb.classList.remove('hidden');
+
+            if (current.some(v => isNaN(v))) {
+                fb.className = 'text-center text-xs font-bold p-3 rounded-xl bg-amber-50 text-amber-800 border border-amber-200';
+                fb.textContent = 'Isi semua kotak kosong terlebih dahulu!';
+                return;
+            }
+
+            const target = current[0] + current[1] + current[2];
+            const lines = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // cols
+                [0, 4, 8], [2, 4, 6]             // diagonals
+            ];
+            const isValid = lines.every(line => line.reduce((acc, i) => acc + current[i], 0) === target);
+
+            if (isValid) {
+                fb.className = 'text-center text-xs font-bold p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200';
+                fb.textContent = `🎉 Luar Biasa! Semua baris, kolom, dan diagonal berjumlah ${target}!`;
+                appState.puzzleSolved++;
+                document.getElementById('puzzle-solved-count').textContent = appState.puzzleSolved;
+                addXP(35, 'Puzzle Ajaib terpecahkan!');
+            } else {
+                fb.className = 'text-center text-xs font-bold p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200';
+                fb.textContent = 'Belum tepat. Pastikan setiap baris, kolom, dan diagonal memiliki jumlah yang sama.';
+            }
+        }
+
+        /* ===================================================================
+           10. MODULE 6: CHATBOT AI STEP-BY-STEP MATH SOLVER (OFFLINE)
+        =================================================================== */
+        function renderChatMessages() {
+            const box = document.getElementById('chat-messages');
+            box.innerHTML = appState.chatHistory.map(msg => {
+                const isUser = msg.sender === 'user';
+                const formatted = msg.text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/`(.*?)`/g, '<code class="bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded font-mono text-xs">$1</code>')
+                    .replace(/\n/g, '<br>');
+
+                return isUser
+                    ? `<div class="flex justify-end">
+                        <div class="max-w-[82%] bg-indigo-600 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-xs sm:text-sm shadow-sm leading-relaxed">
+                            ${formatted}
+                        </div>
+                       </div>`
+                    : `<div class="flex items-start gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">AI</div>
+                        <div class="max-w-[86%] bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm px-4 py-3 text-xs sm:text-sm shadow-sm leading-relaxed">
+                            ${formatted}
+                        </div>
+                       </div>`;
+            }).join('');
+
+            box.scrollTop = box.scrollHeight;
+            renderMath(box);
+        }
+
+        function sendQuickPrompt(promptText) {
+            document.getElementById('chat-input').value = promptText;
+            handleChatSubmit(new Event('submit'));
+        }
+
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const query = input.value.trim();
+            if (!query) return;
+
+            appState.chatHistory.push({ sender: 'user', text: query });
+            input.value = '';
+
+            const reply = generateStepByStepMathReply(query);
+            appState.chatHistory.push({ sender: 'bot', text: reply });
+            saveState();
+            renderChatMessages();
+        }
+
+        function clearChatHistory() {
+            appState.chatHistory = [defaultState.chatHistory[0]];
+            saveState();
+            renderChatMessages();
+            showToast('Riwayat percakapan dibersihkan');
+        }
+
+        // Intelligent Offline Symbolic & Step-by-Step Math Solver
+        function generateStepByStepMathReply(raw) {
+            const q = raw.toLowerCase().replace(/\s+/g, ' ').trim();
+
+            // 1. Quadratic Equation Solver: ax^2 + bx + c = 0
+            const quadMatch = q.replace(/\s+/g, '').match(/([+-]?\d*)x\^?2([+-]\d+)x([+-]\d+)=0/);
+            if (quadMatch) {
+                const aStr = quadMatch[1];
+                const a = aStr === '' || aStr === '+' ? 1 : (aStr === '-' ? -1 : parseFloat(aStr));
+                const b = parseFloat(quadMatch[2]);
+                const c = parseFloat(quadMatch[3]);
+                const D = b * b - 4 * a * c;
+
+                let steps = `**Penyelesaian Persamaan Kuadrat Step-by-Step:**\n`;
+                steps += `Persamaan: $${a}x^2 ${b >= 0 ? '+' + b : b}x ${c >= 0 ? '+' + c : c} = 0$\n`;
+                steps += `**Langkah 1:** Identifikasi koefisien $a = ${a}$, $b = ${b}$, $c = ${c}$.\n`;
+                steps += `**Langkah 2:** Hitung Diskriminan $D = b^2 - 4ac = (${b})^2 - 4(${a})(${c}) = ${D}$.\n`;
+
+                if (D < 0) {
+                    steps += `**Langkah 3:** Karena $D < 0$, persamaan tidak memiliki akar real (akar imajiner).`;
+                } else {
+                    const x1 = (-b + Math.sqrt(D)) / (2 * a);
+                    const x2 = (-b - Math.sqrt(D)) / (2 * a);
+                    steps += `**Langkah 3:** Gunakan Rumus ABC:\n$$x_{1,2} = \\frac{-b \\pm \\sqrt{D}}{2a} = \\frac{${-b} \\pm \\sqrt{${D}}}{${2 * a}}$$\n`;
+                    steps += `**Hasil Akhir:** $x_1 = ${Number.isInteger(x1) ? x1 : x1.toFixed(2)}$ dan $x_2 = ${Number.isInteger(x2) ? x2 : x2.toFixed(2)}$.`;
+                }
+                return steps;
+            }
+
+            // 2. Linear Equation Solver: ax + b = c
+            const linMatch = q.replace(/\s+/g, '').match(/^([+-]?\d*)x([+-]\d+)?=([+-]?\d+)$/);
+            if (linMatch) {
+                const aStr = linMatch[1];
+                const a = aStr === '' || aStr === '+' ? 1 : (aStr === '-' ? -1 : parseFloat(aStr));
+                const b = linMatch[2] ? parseFloat(linMatch[2]) : 0;
+                const c = parseFloat(linMatch[3]);
+                const x = (c - b) / a;
+
+                return `**Penyelesaian Persamaan Linear Step-by-Step:**\n` +
+                       `**Langkah 1:** Persamaan awal: $${a}x ${b >= 0 ? '+' + b : b} = ${c}$\n` +
+                       `**Langkah 2:** Pindahkan konstanta ke ruas kanan: $${a}x = ${c} ${b >= 0 ? '- ' + b : '+ ' + Math.abs(b)} = ${c - b}$\n` +
+                       `**Langkah 3:** Bagi kedua ruas dengan $${a}$:\n$$x = \\frac{${c - b}}{${a}} = ${Number.isInteger(x) ? x : x.toFixed(2)}$$`;
+            }
+
+            // 3. Pythagoras Calculator: a=..., b=...
+            const pythMatch = q.match(/pythagoras.*a\s*=\s*(\d+(?:\.\d+)?).*b\s*=\s*(\d+(?:\.\d+)?)/);
+            if (pythMatch) {
+                const a = parseFloat(pythMatch[1]);
+                const b = parseFloat(pythMatch[2]);
+                const c = Math.sqrt(a * a + b * b);
+                return `**Perhitungan Teorema Pythagoras Step-by-Step:**\n` +
+                       `**Langkah 1:** Diketahui sisi siku-siku $a = ${a}$ dan $b = ${b}$.\n` +
+                       `**Langkah 2:** Gunakan rumus $c = \\sqrt{a^2 + b^2}$\n` +
+                       `**Langkah 3:** $c = \\sqrt{${a}^2 + ${b}^2} = \\sqrt{${a * a} + ${b * b}} = \\sqrt{${a * a + b * b}}$\n` +
+                       `**Hasil Akhir:** Sisi miring $c = ${Number.isInteger(c) ? c : c.toFixed(2)}$.`;
+            }
+
+            // 4. Mean & Median Statistics Helper
+            if (q.includes('mean') || q.includes('median') || q.includes('rata-rata')) {
+                const nums = q.match(/-?\d+(?:\.\d+)?/g);
+                if (nums && nums.length >= 2) {
+                    const arr = nums.map(Number);
+                    const sorted = [...arr].sort((x, y) => x - y);
+                    const sum = arr.reduce((acc, v) => acc + v, 0);
+                    const mean = sum / arr.length;
+                    const mid = Math.floor(sorted.length / 2);
+                    const median = sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+
+                    return `**Analisis Statistika Step-by-Step:**\n` +
+                           `**Langkah 1:** Data terurut ($n = ${arr.length}$): $${sorted.join(', ')}.$\n` +
+                           `**Langkah 2 (Mean):** $\\bar{x} = \\frac{${sum}}{${arr.length}} = ${mean.toFixed(2)}$\n` +
+                           `**Langkah 3 (Median):** Nilai tengah data terurut adalah **${median}**.`;
+                }
+            }
+
+            // 5. Concept & Formula Knowledge Base
+            if (q.includes('pythagoras')) {
+                return `**Rumus Teorema Pythagoras:**\nPada segitiga siku-siku dengan sisi penyiku $a, b$ dan sisi miring $c$:\n$$c^2 = a^2 + b^2$$\nContoh: Jika $a = 3$ dan $b = 4$, maka $c = \\sqrt{3^2 + 4^2} = \\sqrt{25} = 5$.`;
+            }
+            if (q.includes('trigonometri') || q.includes('sin') || q.includes('cos') || q.includes('tan')) {
+                return `**Rumus Dasar Trigonometri:**\n- $\\sin\\theta = \\frac{\\text{Depan}}{\\text{Miring}}$\n- $\\cos\\theta = \\frac{\\text{Samping}}{\\text{Miring}}$\n- $\\tan\\theta = \\frac{\\text{Depan}}{\\text{Samping}} = \\frac{\\sin\\theta}{\\cos\\theta}$\n- Identitas utama: $\\sin^2\\theta + \\cos^2\\theta = 1$`;
+            }
+            if (q.includes('peluang') || q.includes('kombinasi') || q.includes('permutasi')) {
+                return `**Rumus Peluang & Kaidah Pencacahan:**\n- Peluang kejadian $A$: $P(A) = \\frac{n(A)}{n(S)}$\n- Permutasi (urutan diperhatikan): $P(n,r) = \\frac{n!}{(n-r)!}$\n- Kombinasi (urutan diabaikan): $C(n,r) = \\frac{n!}{r!(n-r)!}$`;
+            }
+            if (q.includes('kuadrat') || q.includes('abc')) {
+                return `**Rumus Persamaan Kuadrat ($ax^2 + bx + c = 0$):**\n- Diskriminan: $D = b^2 - 4ac$\n- Rumus Kuadratik (ABC): $$x_{1,2} = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$\nCoba ketik langsung persamaannya, misal: \`x^2 - 5x + 6 = 0\``;
+            }
+            if (q.includes('luas') || q.includes('volume') || q.includes('geometri')) {
+                return `**Ringkasan Rumus Geometri:**\n- Luas Lingkaran: $L = \\pi r^2$\n- Volume Tabung: $V = \\pi r^2 t$\n- Volume Kerucut: $V = \\frac{1}{3}\\pi r^2 t$\n- Volume Bola: $V = \\frac{4}{3}\\pi r^3$\nGunakan tab **Simulasi** di menu bawah untuk menghitung langsung!`;
+            }
+
+            // 6. Safe Arithmetic Expression Evaluator
+            const mathExpr = raw.replace(/×/g, '*').replace(/÷/g, '/').replace(/\^/g, '**').replace(/[^0-9+\-*/().\s]/g, '').trim();
+            if (mathExpr && /[0-9]/.test(mathExpr) && /[+\-*/]/.test(mathExpr)) {
+                try {
+                    const val = Function(`"use strict"; return (${mathExpr})`)();
+                    if (typeof val === 'number' && isFinite(val)) {
+                        return `**Perhitungan Aritmatika Step-by-Step:**\n` +
+                               `**Langkah 1:** Ekspresi matematika: \`${raw}\`\n` +
+                               `**Langkah 2:** Evaluasi sesuai urutan operasi (PEMDAS/KABATAKU).\n` +
+                               `**Hasil Akhir:** **${Number.isInteger(val) ? val : val.toFixed(4)}**`;
+                    }
+                } catch (err) {}
+            }
+
+            return `Saya siap membantu menyelesaikan soal matematika langkah demi langkah! Coba format berikut:\n` +
+                   `1. **Persamaan Kuadrat:** \`x^2 - 5x + 6 = 0\`\n` +
+                   `2. **Persamaan Linear:** \`3x + 4 = 19\`\n` +
+                   `3. **Pythagoras:** \`Pythagoras a=6, b=8\`\n` +
+                   `4. **Statistika:** \`Mean median 7, 8, 9, 10, 6\`\n` +
+                   `5. **Penjelasan Rumus:** \`Rumus trigonometri\`, \`Rumus peluang\`, atau hitung ekspresi seperti \`(24 * 5) + 18\`.`;
+        }
+
+        /* ===================================================================
+           11. INITIALIZE ALL MODULES ON LOAD
+        =================================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            updateNetworkStatus();
+            updateXPDisplay();
+
+            // Init Tab 1: Materi
+            renderMateriModule();
+
+            // Init Tab 2: Simulasi
+            initSimShape();
+
+            // Init Tab 3: Quiz
+            renderQuizModule();
+
+            // Init Tab 4: Video
+            renderVideoPlaylist();
+
+            // Init Tab 5: Game
+            document.getElementById('speed-highscore').textContent = appState.speedHighScore;
+            document.getElementById('puzzle-solved-count').textContent = appState.puzzleSolved;
+            generateMagicPuzzle();
+
+            // Init Tab 6: Chatbot
+            renderChatMessages();
+
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
